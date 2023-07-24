@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Box, Typography, useTheme } from '@mui/material'
 import FlexBetween from '@/components/FlexBetween'
-import PixIcon from '@mui/icons-material/Pix'
+import AcUnitIcon from '@mui/icons-material/AcUnit'
 
 type Props = {};
 
@@ -20,7 +20,7 @@ const Navbar = (props: Props) => {
       <FlexBetween
         gap='0.75rem'
       >
-        <PixIcon sx={{ fontSize: '28px' }}/>
+        <AcUnitIcon sx={{ fontSize: '28px' }}/>
         <Typography variant='h4' fontSize='16px' color={palette.grey[100]}>
           Finanseer
         </Typography>
