@@ -1,6 +1,6 @@
 export const tokens = {
     grey: {
-      100: "#f0f0f3",
+      100: "#ffffff",
       200: "#e1e2e7",
       300: "#d1d3da",
       400: "#c2c5ce",
