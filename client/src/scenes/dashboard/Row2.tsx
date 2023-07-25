@@ -149,7 +149,7 @@ const Row2 = () => {
                 83
               </Typography>
               <Typography variant="h6">
-                Finance goals of the campaign that is desired
+                Marketing campaign finance goals
               </Typography>
             </Box>
             <Box flexBasis="40%">
@@ -159,7 +159,7 @@ const Row2 = () => {
                 Profit Margins
               </Typography>
               <Typography variant="h6">
-                Margins are up by 30% from last month.
+                Margins are up by 30% from last month
               </Typography>
             </Box>
           </FlexBetween>
