@@ -5,6 +5,7 @@ import { Box, CssBaseline, ThemeProvider } from "@mui/material"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Navbar from '@/scenes/navbar'
 import Dashboard from '@/scenes/dashboard'
+import Regressions from '@/scenes/regressions'
 
 function App() {
   const theme = useMemo(() => createTheme(themeSettings), [])
@@ -23,7 +24,7 @@ function App() {
               />
               <Route 
                 path='/regressions' 
-                element={<div>regressions page</div>}
+                element={<Regressions />}
               />
             </Routes>
           </Box>
