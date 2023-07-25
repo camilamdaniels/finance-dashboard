@@ -89,7 +89,7 @@ export const tokens = {
         fontFamily: ["Inter", "sans-serif"].join(","),
         fontSize: 14,
         fontWeight: 600,
-        color: tokens.grey[300],
+        color: tokens.grey[100],
       },
       h5: {
         fontFamily: ["Inter", "sans-serif"].join(","),
@@ -100,7 +100,7 @@ export const tokens = {
       h6: {
         fontFamily: ["Inter", "sans-serif"].join(","),
         fontSize: 10,
-        color: tokens.grey[700],
+        color: tokens.grey[200],
       },
     },
   };

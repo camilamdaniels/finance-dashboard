@@ -83,4 +83,5 @@ const Dashboard = () => {
 
 export default Dashboard
 
-// GRID LAYOUT DOCS: developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas
+// MOZILLA GRID DOCS: developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas
+// MALVEN GRID DOCS: https://grid.malven.co/
