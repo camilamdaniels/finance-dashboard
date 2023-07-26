@@ -49,7 +49,7 @@ const Navbar = (props: Props) => {
               textDecoration: "inherit"
             }}
           >
-            regressions          
+            regression          
           </Link>
         </Box>
       </FlexBetween>
