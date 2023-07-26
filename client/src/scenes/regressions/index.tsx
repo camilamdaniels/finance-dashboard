@@ -2,10 +2,9 @@ import React, { useMemo, useState } from 'react'
 import DashboardBox from '@/components/DashboardBox'
 import { Box, useMediaQuery, useTheme, Button, Typography } from '@mui/material'
 import FlexBetween from '@/components/FlexBetween'
-import { useGetKpisQuery, useGetProductsQuery } from '@/state/api'
+import { useGetKpisQuery } from '@/state/api'
 import {
     CartesianGrid,
-    Label,
     Legend,
     Line,
     LineChart,
@@ -13,18 +12,17 @@ import {
     Tooltip,
     XAxis,
     YAxis,
-    ZAxis,
-    Scatter,
-    ScatterChart
+    Bar,
+    BarChart
 } from 'recharts'
 import regression, { DataPoint } from 'regression'
 import BoxHeader from '@/components/BoxHeader'
 
 const gridTemplateLargeScreens = `
-    "b b ."
-    "b b ."
-    "b b ."
-    "b b ."
+    "b b a"
+    "b b a"
+    "b b a"
+    "b b a"
     "b b c"
     "b b c"
     "b b c"
@@ -37,9 +35,15 @@ const gridTemplateSmallScreens = `
     "b"
     "b"
     "b"
+    "b"
     "c"
     "c"
     "c"
+    "c"
+    "a"
+    "a"
+    "a"
+    "a"
 `
 
 const Regressions = () => {
@@ -47,20 +51,6 @@ const Regressions = () => {
     const { palette } = useTheme();
     const [isPredictions, setIsPredictions] = useState(false)
     const { data: kpiData } = useGetKpisQuery()
-    const { data: productData } = useGetProductsQuery()
-
-    const productExpenseData = useMemo(() => {
-        return (
-          productData &&
-          productData.map(({ _id, price, expense }) => {
-            return {
-              id: _id,
-              price: price,
-              expense: expense,
-            };
-          })
-        );
-      }, [productData]);
 
     const formattedDataLinear = useMemo(() => {
         if (!kpiData) return []
@@ -72,14 +62,27 @@ const Regressions = () => {
             }
         )
 
-        const regressionLine = regression.linear(formatted)
+        const formattedExpenses: Array<DataPoint> = monthData.map(
+            ({ expenses }, i: number) => {
+                return [i, expenses]
+            }
+        )
 
-        return monthData.map(({ month, revenue }, i: number) => {
+        const regressionLine = regression.linear(formatted)
+        const regressionLineExpenses = regression.linear(formattedExpenses)
+
+        return monthData.map(({ month, revenue, expenses }, i: number) => {
+            // console.log('predicted revenue', regressionLine.predict(i+12)[1])
+            // console.log('actual revenue', revenue)
+            console.log('actual expenses', expenses)
+            console.log('predicted expenses', regressionLineExpenses.predict(i+12)[1])
             return {
                 name: month,
                 "Actual Revenue": revenue,
                 "Regression Line": regressionLine.points[i][1],
-                "Predicted Revenue": regressionLine.predict(i + 12)[1]
+                "Predicted Revenue": regressionLine.predict(i + 12)[1],
+                "Actual Expenses": expenses,
+                "Predicted Expenses": regressionLineExpenses.predict(i + 12)[1]
             }
         })
     }, [kpiData])
@@ -134,7 +137,7 @@ const Regressions = () => {
                     }}
                 >
                     <CartesianGrid strokeDasharray="3 3" stroke={palette.grey[200]} />
-                    <XAxis stroke={palette.primary[100]} dataKey="name" tickLine={false} style={{ fontSize: "10px" }} />
+                    <XAxis tick={false} stroke={palette.primary[100]} dataKey="name" tickLine={false} style={{ fontSize: "10px" }} />
                     <YAxis
                         domain={[12000, 26000]}
                         axisLine={{ strokeWidth: "0" }}
@@ -161,7 +164,7 @@ const Regressions = () => {
                         <Line
                             strokeDasharray="5 5"
                             dataKey="Predicted Revenue"
-                            stroke={palette.grey[100]}
+                            stroke={palette.primary[100]}
                         />
                     )}
                 </LineChart>
@@ -169,45 +172,114 @@ const Regressions = () => {
            </DashboardBox>
 
            <DashboardBox gridArea="c">
-            <BoxHeader title="Predicted Revenue vs Expenses" sideText="+4%" />
+            <BoxHeader
+                title="Revenue Predictions"
+                subtitle="actual vs predicted revenue"
+                sideText="+10%"
+            />
             <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart
+                <BarChart
+                    width={500}
+                    height={300}
+                    data={formattedDataLinear}
                     margin={{
-                        top: 20,
-                        right: 25,
-                        bottom: 40,
-                        left: -10,
+                        top: 17,
+                        right: 15,
+                        left: -5,
+                        bottom: 58,
                     }}
                 >
-                    <CartesianGrid stroke={palette.grey[200]} />
+                    <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                            <stop
+                                offset="5%"
+                                stopColor={palette.primary[500]}
+                                stopOpacity={0.8}
+                            />
+                            <stop
+                                offset="95%"
+                                stopColor={palette.primary[500]}
+                                stopOpacity={0}
+                            />
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid vertical={false} stroke={palette.grey[200]} />
                     <XAxis
-                        type="number"
-                        dataKey="price"
-                        name="price"
-                        stroke={palette.primary[100]}
+                        dataKey="name"
                         axisLine={false}
                         tickLine={false}
+                        stroke={palette.primary[100]}
                         style={{ fontSize: "10px" }}
-                        tickFormatter={(v) => `$${v}`}
                     />
                     <YAxis
-                        type="number"
-                        dataKey="expense"
-                        name="expense"
-                        stroke={palette.primary[100]}
                         axisLine={false}
                         tickLine={false}
+                        stroke={palette.primary[100]}
                         style={{ fontSize: "10px" }}
-                        tickFormatter={(v) => `$${v}`}
                     />
-                    <ZAxis type="number" range={[20]} />
-                    <Tooltip formatter={(v) => `$${v}`} />
-                    <Scatter
-                        name="Product Expense Ratio"
-                        data={productExpenseData}
-                        fill={palette.primary[900]}
+                    <Tooltip />
+                    <Bar dataKey="Actual Revenue" fill={palette.primary[700]} />
+                    {isPredictions && (
+                        <Bar dataKey="Predicted Revenue" fill={palette.primary[100]} />
+                    )}
+                </BarChart>
+            </ResponsiveContainer>
+           </DashboardBox>
+
+           <DashboardBox gridArea='a'>
+            <BoxHeader
+                title="Actual vs Predicted Expenses"
+                subtitle="top line represents predictions, bottom line represents actual expenses"
+                sideText="+10%"
+            />
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                    width={500}
+                    height={400}
+                    data={formattedDataLinear}
+                    margin={{
+                        top: 20,
+                        right: 0,
+                        left: -10,
+                        bottom: 55,
+                    }}
+                >
+                    <CartesianGrid vertical={false} stroke={palette.grey[200]} />
+                    <XAxis
+                        dataKey="name"
+                        stroke={palette.primary[100]}
+                        tickLine={false}
+                        style={{ fontSize: "10px" }}
                     />
-                </ScatterChart>
+                    <YAxis
+                        yAxisId="left"
+                        stroke={palette.primary[100]}
+                        tickLine={false}
+                        axisLine={false}
+                        style={{ fontSize: "10px" }}
+                    />
+                    <Tooltip />
+                    <Legend
+                        height={20}
+                        wrapperStyle={{
+                            margin: "0 0 10px 0",
+                        }}
+                    />
+                    <Line
+                        yAxisId="left"
+                        type="monotone"
+                        dataKey="Actual Expenses"
+                        stroke={palette.primary[900]}
+                    />
+                    {isPredictions && (
+                        <Line
+                            yAxisId="left"
+                            type="monotone"
+                            dataKey="Predicted Expenses"
+                            stroke={palette.primary[100]}
+                        />
+                    )}
+                </LineChart>
             </ResponsiveContainer>
            </DashboardBox>
         </Box>
